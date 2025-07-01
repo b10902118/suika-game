@@ -37,7 +37,7 @@ const friction = {
 
 const wallProps = {
   isStatic: true,
-  render: { fillStyle: "#FFEEDB" },
+  render: { fillStyle: "#c68e51" },
   ...friction,
 };
 
@@ -58,17 +58,17 @@ const GameStates = {
 };
 
 const fruitSizes = [
-  { radius: 24, scoreValue: 1, img: "./assets/img/circle0.png" },
-  { radius: 32, scoreValue: 3, img: "./assets/img/circle1.png" },
-  { radius: 40, scoreValue: 6, img: "./assets/img/circle2.png" },
-  { radius: 56, scoreValue: 10, img: "./assets/img/circle3.png" },
-  { radius: 64, scoreValue: 15, img: "./assets/img/circle4.png" },
-  { radius: 72, scoreValue: 21, img: "./assets/img/circle5.png" },
-  { radius: 84, scoreValue: 28, img: "./assets/img/circle6.png" },
-  { radius: 96, scoreValue: 36, img: "./assets/img/circle7.png" },
-  { radius: 128, scoreValue: 45, img: "./assets/img/circle8.png" },
-  { radius: 160, scoreValue: 55, img: "./assets/img/circle9.png" },
-  { radius: 192, scoreValue: 66, img: "./assets/img/circle10.png" },
+  { radius: 49 * 0.5, scoreValue: 1, img: "./images/0.png" },
+  { radius: 63 * 0.5, scoreValue: 3, img: "./images/1.png" },
+  { radius: 88 * 0.5, scoreValue: 6, img: "./images/2.png" },
+  { radius: 96 * 0.5, scoreValue: 10, img: "./images/3.png" },
+  { radius: 126 * 0.5, scoreValue: 15, img: "./images/4.png" },
+  { radius: 164 * 0.5, scoreValue: 21, img: "./images/5.png" },
+  { radius: 184 * 0.5, scoreValue: 28, img: "./images/6.png" },
+  { radius: 223 * 0.5, scoreValue: 36, img: "./images/7.png" },
+  { radius: 251 * 0.5, scoreValue: 45, img: "./images/8.png" },
+  { radius: 309 * 0.5, scoreValue: 55, img: "./images/9.png" },
+  { radius: 360 * 0.5, scoreValue: 66, img: "./images/10.png" },
 ];
 
 const container_height = 960;
@@ -153,18 +153,18 @@ function initBoundry() {
     // Left Wall
     Bodies.rectangle(
       lb - wallThickness / 2,
-      height * (3 / 4),
+      height * (2 / 3),
       wallThickness,
-      height / 2,
+      height * (2 / 3),
       wallProps
     ),
 
     // Right Wall
     Bodies.rectangle(
       rb + wallThickness / 2,
-      height * (3 / 4),
+      height * (2 / 3),
       wallThickness,
-      height / 2,
+      height * (2 / 3),
       wallProps
     ),
 
@@ -232,7 +232,7 @@ function initEnv(restart = false) {
       width: width,
       height: height,
       wireframes: false,
-      background: "#ffdcae",
+      background: "#f7ec96",
     },
   });
   resize();
@@ -355,6 +355,7 @@ function loseGame() {
   Render.stop(render);
   console.log("Game Over! Final Score:", score);
   LosePromptElement.style.display = "flex";
+  restartButton.focus();
   document.removeEventListener("keydown", handlePlayKeydown);
   saveHighscore();
 }
@@ -376,8 +377,8 @@ function generateFruitBody(x, y, sizeIndex, extraConfig = {}) {
     render: {
       sprite: {
         texture: size.img,
-        xScale: size.radius / 512,
-        yScale: size.radius / 512,
+        xScale: 1,
+        yScale: 1,
       },
     },
   });
@@ -425,18 +426,50 @@ function start() {
   startGame();
 }
 
-document.getElementById("start-btn").onclick = start;
+const startButton = document.getElementById("start-btn");
+const restartButton = document.getElementById("restart-btn");
+const backButton = document.getElementById("back-btn");
+
+startButton.onclick = function (e) {
+  if (e.key === "Enter" && stateIndex === GameStates.MENU) {
+    start();
+  }
+};
 document.addEventListener("keydown", function (e) {
   if (e.key === "Enter" && stateIndex === GameStates.MENU) {
     start();
   }
 });
 
-document.getElementById("restart-btn").onclick = function () {
+restartButton.onclick = function () {
   document.getElementById("lose-prompt").style.display = "none";
   start();
 };
-document.getElementById("back-btn").onclick = function () {
+
+function updateMyBest() {
+  const myBestElement = document.getElementById("my-best");
+  const myBestScore = localStorage.getItem("suika-highscore") || "--";
+  myBestElement.textContent = `${myBestScore}`;
+}
+
+// TODO: use db
+function updateWorldRank() {
+  const worldRankElement = document.getElementById("world-rank");
+  const myBestScore = localStorage.getItem("suika-highscore") || "--";
+  const rank = Math.max(1, (3000 - parseInt(myBestScore)) * 3);
+  worldRankElement.textContent = `${rank}`;
+}
+
+backButton.onclick = function () {
   document.getElementById("lose-prompt").style.display = "none";
+  updateMyBest();
+  updateWorldRank();
   document.getElementById("menu").style.display = "flex";
+  startButton.focus();
+  stateIndex = GameStates.MENU;
 };
+
+// TODO: make it faster
+updateMyBest();
+updateWorldRank();
+startButton.focus();
