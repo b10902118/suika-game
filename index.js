@@ -107,8 +107,8 @@ function setNextFruitSize() {
   //elements.nextFruitImg.src = `./assets/img/circle${nextFruitSize}.png`;
 }
 
-var engine;
-var runner;
+const engine = Engine.create();
+const runner = Runner.create();
 var render;
 var mouseConstraint;
 
@@ -203,25 +203,43 @@ function resize() {
   render.canvas.style.width = `${document.body.clientWidth}px`;
 }
 
-function initEnv(restart = false) {
-  if (!restart) {
-    engine = Engine.create();
-    runner = Runner.create();
-    const gameStatics = initBoundry();
-    render = Render.create({
-      element: elements.canvas,
-      engine,
-      options: {
-        width: width,
-        height: height,
-        wireframes: false,
-        background: "#ffdcae",
-      },
-    });
-    resize();
-    addMouseControl();
-    Composite.add(engine.world, gameStatics);
+function handlePlayKeydown(e) {
+  if (stateIndex !== GameStates.READY) return;
+  if (elements.previewBall === null) return;
+
+  const step = 20; // pixels to move per key press
+  if (e.key === "ArrowLeft") {
+    elements.previewBall.position.x = Math.max(
+      elements.previewBall.position.x - step,
+      lb
+    );
+  } else if (e.key === "ArrowRight") {
+    elements.previewBall.position.x = Math.min(
+      elements.previewBall.position.x + step,
+      rb
+    );
+  } else if (e.key === "Enter" || e.key === "ArrowDown") {
+    addFruit(elements.previewBall.position.x);
   }
+}
+
+function initEnv(restart = false) {
+  const gameStatics = initBoundry();
+  render = Render.create({
+    element: elements.canvas,
+    engine,
+    options: {
+      width: width,
+      height: height,
+      wireframes: false,
+      background: "#ffdcae",
+    },
+  });
+  resize();
+  addMouseControl();
+  Composite.add(engine.world, gameStatics);
+
+  Runner.run(runner, engine);
 
   Events.on(engine, "collisionStart", function (e) {
     for (let i = 0; i < e.pairs.length; i++) {
@@ -267,63 +285,37 @@ function initEnv(restart = false) {
 }
 
 function startGame() {
-  /*
-  Engine.clear(engine);
-  Render.stop(render);
-  Runner.stop(runner);
-  */
-  //initEnv(true);
-  console.log("Game inited");
+  runner.enabled = true;
+  Render.run(render);
+
   // Init game state
-
-  nextFruitSize = 0;
-  currentFruitSize = 0;
-  const allBodies = Composite.allBodies(engine.world);
-  for (const body of allBodies) {
-    if (!body.isStatic) {
-      Composite.remove(engine.world, body);
-    }
-  }
-
-  //sounds.click.play();
+  nextFruitSize = Math.floor(rand() * 5);
+  currentFruitSize = Math.floor(rand() * 5);
+  Composite.clear(engine.world, true);
+  //Engine.clear(engine);
 
   for (let i = 0; i < fruitSizes.length; i++) {
     fruitsMerged[i] = 0;
   }
   calculateScore();
 
-  runner.enabled = true;
-  Render.run(render);
-  Runner.run(runner, engine);
+  //runner.enabled = true;
 
-  elements.previewBall = generateFruitBody(width / 2, previewBallHeight, 0, {
-    isStatic: true,
-  });
+  elements.previewBall = generateFruitBody(
+    width / 2,
+    previewBallHeight,
+    currentFruitSize,
+    {
+      isStatic: true,
+    }
+  );
   Composite.add(engine.world, elements.previewBall);
 
   setTimeout(() => {
     stateIndex = GameStates.READY;
   }, 250);
 
-  document.addEventListener("keydown", function (e) {
-    if (stateIndex !== GameStates.READY) return;
-    if (elements.previewBall === null) return;
-
-    const step = 20; // pixels to move per key press
-    if (e.key === "ArrowLeft") {
-      elements.previewBall.position.x = Math.max(
-        elements.previewBall.position.x - step,
-        lb
-      );
-    } else if (e.key === "ArrowRight") {
-      elements.previewBall.position.x = Math.min(
-        elements.previewBall.position.x + step,
-        rb
-      );
-    } else if (e.key === "Enter" || e.key === "ArrowDown") {
-      addFruit(elements.previewBall.position.x);
-    }
-  });
+  document.addEventListener("keydown", handlePlayKeydown);
 }
 
 function addPop(x, y, r) {
@@ -346,15 +338,6 @@ function addPop(x, y, r) {
   }, 100);
 }
 
-document.getElementById("restart-btn").onclick = function () {
-  document.getElementById("lose-prompt").style.display = "none";
-  document.getElementById("start-btn").click();
-};
-document.getElementById("back-btn").onclick = function () {
-  document.getElementById("lose-prompt").style.display = "none";
-  document.getElementById("menu").style.display = "flex";
-};
-
 function saveHighscore() {
   const highscore = localStorage.getItem("suika-highscore");
   if (highscore === null || score > parseInt(highscore)) {
@@ -366,10 +349,13 @@ function saveHighscore() {
 const LosePromptElement = document.getElementById("lose-prompt");
 function loseGame() {
   stateIndex = GameStates.LOSE;
+  // somehow have to remove here, after it will stay
+  Composite.remove(engine.world, elements.previewBall);
   runner.enabled = false;
+  Render.stop(render);
   console.log("Game Over! Final Score:", score);
   LosePromptElement.style.display = "flex";
-  document.removeEventListener("keydown", arguments.callee);
+  document.removeEventListener("keydown", handlePlayKeydown);
   saveHighscore();
 }
 
@@ -434,7 +420,23 @@ function addFruit(x) {
 document.addEventListener("DOMContentLoaded", () => initEnv());
 //window.addEventListener("resize", resizeCanvas);
 
-document.getElementById("start-btn").onclick = function () {
+function start() {
   document.getElementById("menu").style.display = "none";
   startGame();
+}
+
+document.getElementById("start-btn").onclick = start;
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && stateIndex === GameStates.MENU) {
+    start();
+  }
+});
+
+document.getElementById("restart-btn").onclick = function () {
+  document.getElementById("lose-prompt").style.display = "none";
+  start();
+};
+document.getElementById("back-btn").onclick = function () {
+  document.getElementById("lose-prompt").style.display = "none";
+  document.getElementById("menu").style.display = "flex";
 };
