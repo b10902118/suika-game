@@ -6,10 +6,60 @@
     <title>Suika / Watermelon Game Clone</title>
     <meta property="og:title" content="Suika / Watermelon Game Clone" />
   </head>
+  <style>
+    html,
+    body {
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Prevent scrolling */
+      /*background: #ffeedb;*/
+    }
+    /*
+    #game-score {
+      position: fixed;
+      width: 100vw;
+      font-size: 84px;
+      font-weight: 900;
+      padding-left: 16px;
+      background: transparent;
+    }
+      */
+    #game-score {
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 32px;
+      font-weight: 900;
+      padding-left: 16px;
+      padding-top: 0px;
+      margin-top: 0px;
+      margin-top: 0px;
+      background: transparent;
+      pointer-events: none;
+      z-index: 1000;
+      font-family: "Press Start 2P", "VT323", "Courier New", Courier, monospace;
+      text-shadow: 2px 2px 0 #fff;
+      color: #ff4c4c;
+    }
+  </style>
   <body>
-    <div class="container">
-      <div id="game-canvas"></div>
+    <div id="menu" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:3000; background:#fff;display:flex; flex-direction:column; justify-content:center; align-items:center;">
+      <p style="font-size: 32px; text-align: center;">Suika!</p>
+      <button id="start-btn" style="font-size:16px; padding:12px 20px; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold;">Start</button>
     </div>
+    <p id="game-score">0</p>
+    <div id="lose-prompt" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+      <div style="background:#fff; padding:32px 24px; border-radius:12px; box-shadow:0 4px 24px rgba(0,0,0,0.2); text-align:center;">
+        <h2 style="color:#ff4c4c; margin-bottom:16px;">Game Over!</h2>
+        <div style="display:flex; gap:16px; justify-content:center;">
+          <button id="restart-btn" style="font-size:18px; padding:8px 24px; border:none; border-radius:6px; background:#ff4c4c; color:#fff; cursor:pointer;">Replay</button>
+          <button id="back-btn" style="font-size:18px; padding:8px 24px; border:none; border-radius:6px; background:#ff4c4c; color:#fff; cursor:pointer;">Back</button>
+        </div>
+      </div>
+    </div>
+    <div id="game-canvas"></div>
     <script type="text/javascript" src="./matter.js"></script>
     <script type="text/javascript" src="./index.js?v=4"></script>
   </body>
