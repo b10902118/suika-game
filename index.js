@@ -435,11 +435,6 @@ startButton.onclick = function (e) {
     start();
   }
 };
-document.addEventListener("keydown", function (e) {
-  if (e.key === "Enter" && stateIndex === GameStates.MENU) {
-    start();
-  }
-});
 
 restartButton.onclick = function () {
   document.getElementById("lose-prompt").style.display = "none";
