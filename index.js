@@ -24,6 +24,9 @@ const {
   Events,
 } = Matter;
 
+const Serializer = MatterTools.Serializer;
+const serializer = Serializer.create();
+
 const wallThickness = 32;
 const loseHeight = 84;
 const statusBarHeight = 48;
@@ -112,6 +115,25 @@ const runner = Runner.create();
 var render;
 var mouseConstraint;
 
+function saveGameState() {
+  Serializer.saveState(serializer, engine, "gameState");
+  localStorage.setItem("gameScore", score);
+  localStorage.setItem("gameFruitsMerged", JSON.stringify(fruitsMerged));
+}
+
+function loadGameState() {
+  // TODO: handle error
+  Serializer.loadState(serializer, engine, "gameState");
+  score = localStorage.getItem("gameScore");
+  const merged = localStorage.getItem("gameFruitsMerged");
+  if (merged) {
+    const arr = JSON.parse(merged);
+    for (let i = 0; i < fruitSizes.length; i++) {
+      fruitsMerged[i] = arr[i] || 0;
+    }
+  }
+}
+
 function addMouseControl() {
   const mouse = Mouse.create(render.canvas);
   mouseConstraint = MouseConstraint.create(engine, {
@@ -148,8 +170,10 @@ function initBoundry() {
   width = height * (document.body.clientWidth / document.body.clientHeight);
   lb = width / 2 - container_width / 2;
   rb = width / 2 + container_width / 2;
+}
 
-  const gameStatics = [
+function initStatics() {
+  return [
     // Left Wall
     Bodies.rectangle(
       lb - wallThickness / 2,
@@ -195,7 +219,6 @@ function initBoundry() {
       wallProps
     ),
   ];
-  return gameStatics;
 }
 
 function resize() {
@@ -235,8 +258,10 @@ function handlePlayKeydown(e) {
   }
 }
 
-function initEnv(restart = false) {
-  const gameStatics = initBoundry();
+function initEnv() {
+  initBoundry();
+  const gameStatics = initStatics();
+  Composite.add(engine.world, gameStatics);
   render = Render.create({
     element: elements.canvas,
     engine,
@@ -249,9 +274,6 @@ function initEnv(restart = false) {
   });
   resize();
   addMouseControl();
-  Composite.add(engine.world, gameStatics);
-
-  Runner.run(runner, engine);
 
   Events.on(engine, "collisionStart", function (e) {
     for (let i = 0; i < e.pairs.length; i++) {
@@ -297,21 +319,22 @@ function initEnv(restart = false) {
 }
 
 function startGame() {
-  runner.enabled = true;
-  Render.run(render);
-
-  // Init game state
-  nextFruitSize = Math.floor(rand() * 5);
-  currentFruitSize = Math.floor(rand() * 5);
-  Composite.clear(engine.world, true);
-  //Engine.clear(engine);
-
-  for (let i = 0; i < fruitSizes.length; i++) {
-    fruitsMerged[i] = 0;
+  if (localStorage.getItem("gameState") !== null) {
+    loadGameState();
+  } else {
+    // Init game state
+    Composite.clear(engine.world, true);
+    for (let i = 0; i < fruitSizes.length; i++) {
+      fruitsMerged[i] = 0;
+    }
+    nextFruitSize = Math.floor(rand() * 5);
+    currentFruitSize = Math.floor(rand() * 5);
   }
-  calculateScore();
+  calculateScore(); // show the score
 
-  //runner.enabled = true;
+  runner.enabled = true;
+  Runner.run(runner, engine);
+  Render.run(render);
 
   elements.previewBall = generateFruitBody(
     width / 2,
@@ -323,9 +346,7 @@ function startGame() {
   );
   Composite.add(engine.world, elements.previewBall);
 
-  setTimeout(() => {
-    stateIndex = GameStates.READY;
-  }, 250);
+  stateIndex = GameStates.READY;
 
   document.addEventListener("keydown", handlePlayKeydown);
 }
@@ -422,6 +443,7 @@ function addFruit(x) {
     }
   );
 
+  saveGameState();
   setTimeout(() => {
     if (stateIndex === GameStates.DROP) {
       Composite.add(engine.world, elements.previewBall);
@@ -438,6 +460,11 @@ function start() {
   startGame();
 }
 
+function restart() {
+  document.getElementById("lose-prompt").style.display = "none";
+  startGame();
+}
+
 const startButton = document.getElementById("start-btn");
 const restartButton = document.getElementById("restart-btn");
 const backButton = document.getElementById("back-btn");
@@ -449,8 +476,7 @@ startButton.onclick = function (e) {
 };
 
 restartButton.onclick = function () {
-  document.getElementById("lose-prompt").style.display = "none";
-  start();
+  restart();
 };
 
 function updateMyBest() {
