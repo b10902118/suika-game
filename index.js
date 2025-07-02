@@ -207,15 +207,27 @@ function handlePlayKeydown(e) {
   if (stateIndex !== GameStates.READY) return;
   if (elements.previewBall === null) return;
 
-  const step = 20; // pixels to move per key press
+  const stepSmall = 20; // pixels to move per key press
+  const stepBig = 60; // pixels to move per key press
   if (e.key === "ArrowLeft") {
     elements.previewBall.position.x = Math.max(
-      elements.previewBall.position.x - step,
+      elements.previewBall.position.x - stepSmall,
       lb
     );
   } else if (e.key === "ArrowRight") {
     elements.previewBall.position.x = Math.min(
-      elements.previewBall.position.x + step,
+      elements.previewBall.position.x + stepSmall,
+      rb
+    );
+  }
+  if (e.key === "1") {
+    elements.previewBall.position.x = Math.max(
+      elements.previewBall.position.x - stepBig,
+      lb
+    );
+  } else if (e.key === "3") {
+    elements.previewBall.position.x = Math.min(
+      elements.previewBall.position.x + stepBig,
       rb
     );
   } else if (e.key === "Enter" || e.key === "ArrowDown") {
