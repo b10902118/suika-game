@@ -431,7 +431,7 @@ const restartButton = document.getElementById("restart-btn");
 const backButton = document.getElementById("back-btn");
 
 startButton.onclick = function (e) {
-  if (e.key === "Enter" && stateIndex === GameStates.MENU) {
+  if (stateIndex === GameStates.MENU) {
     start();
   }
 };
@@ -455,7 +455,11 @@ function updateMyBest() {
 // TODO: use db
 function updateWorldRank() {
   const worldRankElement = document.getElementById("world-rank");
-  const myBestScore = localStorage.getItem("suika-highscore") || "--";
+  const myBestScore = localStorage.getItem("suika-highscore");
+  if (!myBestScore) {
+    worldRankElement.textContent = "--";
+    return;
+  }
   const rank = Math.max(1, (3000 - parseInt(myBestScore)) * 3);
   worldRankElement.textContent = `${rank}`;
 }

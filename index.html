@@ -50,19 +50,8 @@
   <body>
     <div id="menu" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:3000; background: #f7ec96;;display:flex; flex-direction:column; justify-content:cneter;align-items:center;">
       <div style="display: flex; justify-content: center; align-items: center;">
-        <div style="position: relative; width: 70vh; height: 70vh;">
-          <!-- 11 images in a ring -->
-          <img src="images/2.png" alt="0" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(0deg) translate(28vh) rotate(0deg);">
-          <img src="images/3.png" alt="1" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(32.7deg) translate(28vh) rotate(-32.7deg);">
-          <img src="images/4.png" alt="2" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(65.4deg) translate(28vh) rotate(-65.4deg);">
-          <img src="images/5.png" alt="3" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(98.1deg) translate(28vh) rotate(-98.1deg);">
-          <img src="images/6.png" alt="4" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(130.8deg) translate(28vh) rotate(-130.8deg);">
-          <img src="images/7.png" alt="5" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(163.5deg) translate(28vh) rotate(-163.5deg);">
-          <img src="images/8.png" alt="6" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(196.2deg) translate(28vh) rotate(-196.2deg);">
-          <img src="images/9.png" alt="7" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(228.9deg) translate(28vh) rotate(-228.9deg);">
-          <img src="images/10.png" alt="8" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(261.6deg) translate(28vh) rotate(-261.6deg);">
-          <img src="images/0.png" alt="9" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(294.3deg) translate(28vh) rotate(-294.3deg);">
-          <img src="images/1.png" alt="10" style="position:absolute; left:50%; top:50%; height:13vw; transform:translate(-50%,-50%) rotate(327deg) translate(28vh) rotate(-327deg);">
+        <div style="position: relative; width: 70vh; height: 70vh; display: flex; justify-content: center; align-items: center;">
+          <img src="./images/evolution.png" alt="Evolution Ring" style="width: 100%; object-fit: contain; pointer-events: none;" />
           <span style="
             position: absolute;
             left: 50%;
@@ -74,7 +63,7 @@
             color: #ff4c4c;
             pointer-events: none;
             white-space: nowrap;
-          ">Suika!</span>
+          ">Suika</span>
         </div>
       </div>
       <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2vh; width: 100%;">
@@ -88,14 +77,14 @@
         </div>
         <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 10vw; width: 100%;">
           <div style="flex: 1; display: flex; justify-content: center;">
-            <span id="my-best" style="font-size: 5vh; font-weight: bold; font-family: 'Press Start 2P', 'VT323', 'Courier New', Courier, monospace; color: #333;">000</span>
+            <span id="my-best" style="font-size: 5vh; font-weight: bold; font-family: 'Press Start 2P', 'VT323', 'Courier New', Courier, monospace; color: #333;">--</span>
           </div>
           <div style="flex: 1; display: flex; justify-content: center;">
-            <span id="world-rank" style="font-size: 5vh; font-weight: bold; font-family: 'Press Start 2P', 'VT323', 'Courier New', Courier, monospace; color: #333;">000</span>
+            <span id="world-rank" style="font-size: 5vh; font-weight: bold; font-family: 'Press Start 2P', 'VT323', 'Courier New', Courier, monospace; color: #333;">--</span>
           </div>
         </div>
       </div>
-      <button id="start-btn" style="font-size:5vh; padding:4vh 5vh; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold; width:50vw; margin-top: 5px;">Start</button>
+      <button id="start-btn" style="font-size:5vh; padding:3vh 10vh; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold; margin-top: 5px;">Start</button>
     </div>
     <p id="game-score">0</p>
     <div id="lose-prompt" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
