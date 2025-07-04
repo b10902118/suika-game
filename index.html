@@ -29,9 +29,9 @@
       position: absolute;
       left: 0;
       top: 0;
-      font-size: 32px;
+      font-size: 10vh;
       font-weight: 900;
-      padding-left: 16px;
+      padding-left: 5vw;
       padding-top: 0px;
       margin-top: 0px;
       margin-top: 0px;
@@ -39,7 +39,7 @@
       pointer-events: none;
       z-index: 1000;
       font-family: "Press Start 2P", "VT323", "Courier New", Courier, monospace;
-      text-shadow: 2px 2px 0 #fff;
+      text-shadow: 0.5vh 0.5vh 0 #fff;
       color: #ff4c4c;
     }
     button:focus {
@@ -84,18 +84,46 @@
           </div>
         </div>
       </div>
-      <button id="start-btn" style="font-size:5vh; padding:3vh 10vh; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold; margin-top: 5px;">Start</button>
+      <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 2vw; margin-top: 5px; width: 100%;">
+        <div style="flex:1; display:flex; justify-content:flex-end;">
+          <!-- Empty or add a left button if needed -->
+        </div>
+        <div style="flex:0; display:flex; justify-content:center;">
+          <button id="start-btn" style="font-size:5vh; width: 30vh; height: 12vh; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold;">...</button>
+        </div>
+        <div style="flex:1; display:flex; justify-content:flex-end;">
+          <button id="achievement-btn" style="font-size:5vh; width:10vh; height:10vh; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; margin-right: 2vw;">
+            🏆
+          </button>
+        </div>
+      </div>
     </div>
+    <div id="hint" style="display: none; justify-content: center ;position: fixed; top:10%; left: 0%; width: 100%">
+      <img src="./images/hint.svg" alt="Hint" style="height: 10vh">
+    </div>
+
     <p id="game-score">0</p>
+
     <div id="lose-prompt" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
       <div style="background:#fff; padding:32px 24px; border-radius:12px; box-shadow:0 4px 24px rgba(0,0,0,0.2); text-align:center;">
-        <h2 style="color:#ff4c4c; margin-bottom:16px;">Game Over!</h2>
+        <p style="font-size:12vw; color:#ff4c4c; margin:5vh auto;">Game Over!</p>
         <div style="display:flex; gap:16px; justify-content:center;">
           <button id="restart-btn" style="display:flex;justify-content:center;align-items:center;width:35vw;font-size:8vw; padding:8px 24px; border:none; border-radius:6px; background:#ff4c4c; color:#fff; cursor:pointer;">Replay</button>
           <button id="back-btn" style="display:flex;justify-content:center;align-items:center;width:35vw;font-size:8vw; padding:8px 24px; border:none; border-radius:6px; background:#ff4c4c; color:#fff; cursor:pointer;">Back</button>
         </div>
       </div>
     </div>
+
+    <div id="save-prompt" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+      <div style="background:#fff; padding:32px 24px; border-radius:12px; box-shadow:0 4px 24px rgba(0,0,0,0.2); text-align:center;">
+        <p style="font-size:12vw; color:#ff4c4c; margin:5vh auto;">Leaving, Save?</p>
+        <div style="display:flex; gap:16px; justify-content:center;">
+          <button id="save-yes-btn" style="display:flex;justify-content:center;align-items:center;width:35vw;font-size:8vw; padding:8px 24px; border:none; border-radius:6px; background:#ff4c4c; color:#fff; cursor:pointer;">Yes</button>
+          <button id="save-no-btn" style="display:flex;justify-content:center;align-items:center;width:35vw;font-size:8vw; padding:8px 24px; border:none; border-radius:6px; background:#ff4c4c; color:#fff; cursor:pointer;">No</button>
+        </div>
+      </div>
+    </div>
+
     <div id="game-canvas"></div>
     <script type="text/javascript" src="./matter.js"></script>
     <script type="text/javascript" src="./matter-tools.serializer.js"></script>

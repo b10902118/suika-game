@@ -83,14 +83,27 @@ var lb;
 var rb;
 const elements = {
   canvas: document.getElementById("game-canvas"),
-  previewBall: null,
+  menu: document.getElementById("menu"),
+  losePrompt: document.getElementById("lose-prompt"),
+  savePrompt: document.getElementById("save-prompt"),
+  myBest: document.getElementById("my-best"),
+  worldRank: document.getElementById("world-rank"),
+  startButton: document.getElementById("start-btn"),
+  restartButton: document.getElementById("restart-btn"),
+  backButton: document.getElementById("back-btn"),
+  saveYesButton: document.getElementById("save-yes-btn"),
+  saveNoButton: document.getElementById("save-no-btn"),
+  hint: document.getElementById("hint"),
+  score: document.getElementById("game-score"),
+  achievement: document.getElementById("achievement-btn"),
 };
+
+var previewBall = null;
 
 var stateIndex = GameStates.MENU;
 
 var score = 0;
 const fruitsMerged = [];
-const scoreElement = document.getElementById("game-score");
 function calculateScore() {
   new_score = fruitsMerged.reduce((total, count, sizeIndex) => {
     const value = fruitSizes[sizeIndex].scoreValue * count;
@@ -98,7 +111,7 @@ function calculateScore() {
   }, 0);
   if (new_score !== score) {
     score = new_score;
-    scoreElement.textContent = `${score}`;
+    elements.score.textContent = `${score}`;
     //console.log("Score updated:", score);
   }
 }
@@ -115,7 +128,21 @@ const runner = Runner.create();
 var render;
 var mouseConstraint;
 
+function stopGame() {
+  document.removeEventListener("keydown", handlePlayKeydown);
+  // somehow have to remove here, let restarted to regenerate
+  // clear on restart can't clear it (isStatic?)
+  Composite.remove(engine.world, previewBall);
+  Runner.stop(runner);
+  Render.stop(render);
+}
+
+function haveSavedGame() {
+  return localStorage.getItem("gameScore") !== null;
+}
+
 function saveGameState() {
+  stopGame();
   Serializer.saveState(serializer, engine, "gameState");
   localStorage.setItem("gameScore", score);
   localStorage.setItem("gameFruitsMerged", JSON.stringify(fruitsMerged));
@@ -123,15 +150,29 @@ function saveGameState() {
 
 function loadGameState() {
   // TODO: handle error
-  Serializer.loadState(serializer, engine, "gameState");
-  score = localStorage.getItem("gameScore");
-  const merged = localStorage.getItem("gameFruitsMerged");
-  if (merged) {
+  if (!haveSavedGame()) return false;
+  try {
+    Serializer.loadState(serializer, engine, "gameState");
+    score = localStorage.getItem("gameScore");
+    const merged = localStorage.getItem("gameFruitsMerged");
     const arr = JSON.parse(merged);
     for (let i = 0; i < fruitSizes.length; i++) {
       fruitsMerged[i] = arr[i] || 0;
     }
+    clearGameState(); // should not be accessed again
+    return true;
+  } catch (e) {
+    console.error("Failed to load game state:", e);
+    console.error("Clearing game state due to error.");
+    clearGameState();
+    return false;
   }
+}
+
+function clearGameState() {
+  localStorage.removeItem("gameState");
+  localStorage.removeItem("gameScore");
+  localStorage.removeItem("gameFruitsMerged");
 }
 
 function addMouseControl() {
@@ -148,21 +189,23 @@ function addMouseControl() {
   render.mouse = mouse;
 
   Events.on(mouseConstraint, "mouseup", function (e) {
-    elements.previewBall.position.x = Math.max(
-      lb,
-      Math.min(rb, e.mouse.position.x)
-    );
-    addFruit(elements.previewBall.position.x);
+    if (elements.hint.style.display !== "none") {
+      elements.hint.style.display = "none";
+    }
+
+    previewBall.position.x = Math.max(lb, Math.min(rb, e.mouse.position.x));
+    addFruit(previewBall.position.x);
   });
 
   Events.on(mouseConstraint, "mousemove", function (e) {
-    if (stateIndex !== GameStates.READY) return;
-    if (elements.previewBall === null) return;
+    if (elements.hint.style.display !== "none") {
+      elements.hint.style.display = "none";
+    }
 
-    elements.previewBall.position.x = Math.max(
-      lb,
-      Math.min(rb, e.mouse.position.x)
-    );
+    if (stateIndex !== GameStates.READY) return;
+    if (previewBall === null) return;
+
+    previewBall.position.x = Math.max(lb, Math.min(rb, e.mouse.position.x));
   });
 }
 
@@ -226,35 +269,35 @@ function resize() {
   render.canvas.style.width = `${document.body.clientWidth}px`;
 }
 
-function handlePlayKeydown(e) {
-  if (stateIndex !== GameStates.READY) return;
-  if (elements.previewBall === null) return;
+const validKeys = [
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowDown",
+  "Enter",
+  "1",
+  "3",
+  "4",
+  "6",
+];
 
-  const stepSmall = 20; // pixels to move per key press
-  const stepBig = 60; // pixels to move per key press
-  if (e.key === "ArrowLeft") {
-    elements.previewBall.position.x = Math.max(
-      elements.previewBall.position.x - stepSmall,
-      lb
-    );
-  } else if (e.key === "ArrowRight") {
-    elements.previewBall.position.x = Math.min(
-      elements.previewBall.position.x + stepSmall,
-      rb
-    );
+const stepSmall = 20; // pixels to move per key press
+const stepBig = 60; // pixels to move per key press
+
+function handlePlayKeydown(e) {
+  if (elements.hint.style.display !== "none" && validKeys.includes(e.key)) {
+    elements.hint.style.display = "none";
   }
-  if (e.key === "1") {
-    elements.previewBall.position.x = Math.max(
-      elements.previewBall.position.x - stepBig,
-      lb
-    );
+
+  if (e.key === "ArrowLeft" || e.key === "4") {
+    previewBall.position.x = Math.max(previewBall.position.x - stepSmall, lb);
+  } else if (e.key === "ArrowRight" || e.key === "6") {
+    previewBall.position.x = Math.min(previewBall.position.x + stepSmall, rb);
+  } else if (e.key === "1") {
+    previewBall.position.x = Math.max(previewBall.position.x - stepBig, lb);
   } else if (e.key === "3") {
-    elements.previewBall.position.x = Math.min(
-      elements.previewBall.position.x + stepBig,
-      rb
-    );
+    previewBall.position.x = Math.min(previewBall.position.x + stepBig, rb);
   } else if (e.key === "Enter" || e.key === "ArrowDown") {
-    addFruit(elements.previewBall.position.x);
+    addFruit(previewBall.position.x);
   }
 }
 
@@ -293,12 +336,7 @@ function initEnv() {
       // Skip if already popped
       if (bodyA.popped || bodyB.popped) continue;
 
-      let newSize = bodyA.sizeIndex + 1;
-
-      // Go back to smallest size
-      if (bodyA.circleRadius >= fruitSizes[fruitSizes.length - 1].radius) {
-        newSize = 0;
-      }
+      let newSize = (bodyA.sizeIndex + 1) % fruitSizes.length;
 
       fruitsMerged[bodyA.sizeIndex] += 1;
 
@@ -312,16 +350,19 @@ function initEnv() {
       //sounds[`pop${bodyA.sizeIndex}`].play();
       Composite.remove(engine.world, [bodyA, bodyB]);
       Composite.add(engine.world, generateFruitBody(midPosX, midPosY, newSize));
+      // Bug: could squeezed through wall
       addPop(midPosX, midPosY, bodyA.circleRadius);
       calculateScore();
     }
   });
 }
 
-function startGame() {
-  if (localStorage.getItem("gameState") !== null) {
-    loadGameState();
-  } else {
+function showHint() {
+  elements.hint.style.display = "flex";
+}
+
+function startGame(restart = false) {
+  if (!loadGameState()) {
     // Init game state
     Composite.clear(engine.world, true);
     for (let i = 0; i < fruitSizes.length; i++) {
@@ -329,14 +370,16 @@ function startGame() {
     }
     nextFruitSize = Math.floor(rand() * 5);
     currentFruitSize = Math.floor(rand() * 5);
+    if (!restart) {
+      showHint();
+    }
   }
   calculateScore(); // show the score
 
-  runner.enabled = true;
   Runner.run(runner, engine);
   Render.run(render);
 
-  elements.previewBall = generateFruitBody(
+  previewBall = generateFruitBody(
     width / 2,
     previewBallHeight,
     currentFruitSize,
@@ -344,7 +387,7 @@ function startGame() {
       isStatic: true,
     }
   );
-  Composite.add(engine.world, elements.previewBall);
+  Composite.add(engine.world, previewBall);
 
   stateIndex = GameStates.READY;
 
@@ -372,24 +415,29 @@ function addPop(x, y, r) {
 }
 
 function saveHighscore() {
-  const highscore = localStorage.getItem("suika-highscore");
+  const highscore = localStorage.getItem("highscore");
   if (highscore === null || score > parseInt(highscore)) {
-    localStorage.setItem("suika-highscore", score);
+    localStorage.setItem("highscore", score);
     console.log("New highscore saved:", score);
   }
 }
 
-const LosePromptElement = document.getElementById("lose-prompt");
+function showSavePrompt() {
+  elements.savePrompt.style.display = "flex";
+  elements.saveYesButton.focus();
+}
+
+function showLosePrompt() {
+  elements.losePrompt.style.display = "flex";
+  elements.restartButton.focus();
+}
+
 function loseGame() {
+  //clearGameState();
   stateIndex = GameStates.LOSE;
-  // somehow have to remove here, after it will stay
-  Composite.remove(engine.world, elements.previewBall);
-  runner.enabled = false;
-  Render.stop(render);
+  stopGame();
   console.log("Game Over! Final Score:", score);
-  LosePromptElement.style.display = "flex";
-  restartButton.focus();
-  document.removeEventListener("keydown", handlePlayKeydown);
+  showLosePrompt();
   saveHighscore();
 }
 
@@ -430,83 +478,108 @@ function addFruit(x) {
 
   currentFruitSize = nextFruitSize;
   setNextFruitSize();
-  calculateScore();
+  //calculateScore();
 
-  Composite.remove(engine.world, elements.previewBall);
-  elements.previewBall = generateFruitBody(
-    x,
-    previewBallHeight,
-    currentFruitSize,
-    {
-      isStatic: true,
-      collisionFilter: { mask: 0x0040 },
-    }
-  );
+  Composite.remove(engine.world, previewBall);
+  previewBall = generateFruitBody(x, previewBallHeight, currentFruitSize, {
+    isStatic: true,
+    collisionFilter: { mask: 0x0040 },
+  });
 
-  saveGameState();
   setTimeout(() => {
     if (stateIndex === GameStates.DROP) {
-      Composite.add(engine.world, elements.previewBall);
+      Composite.add(engine.world, previewBall);
       stateIndex = GameStates.READY;
     }
   }, 500);
 }
 
-document.addEventListener("DOMContentLoaded", () => initEnv());
+function updateMyBestElement() {
+  const myBestScore = localStorage.getItem("highscore") || "--";
+  elements.myBest.textContent = `${myBestScore}`;
+}
+
+// TODO: use db
+function updateWorldRankElement() {
+  const myBestScore = localStorage.getItem("highscore");
+  if (!myBestScore) {
+    elements.worldRank.textContent = "--";
+    return;
+  }
+  const rank = Math.max(1, (3000 - parseInt(myBestScore)) * 3);
+  elements.worldRank.textContent = `${rank}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initEnv();
+  updateMyBestElement();
+  updateWorldRankElement();
+  showMenu();
+  elements.startButton.focus();
+});
 //window.addEventListener("resize", resizeCanvas);
 
+window.addEventListener("popstate", (event) => {
+  if (elements.menu.style.display !== "none") {
+    window.history.back();
+  } else if (elements.losePrompt.style.display !== "none") {
+    showMenu();
+  } else if (elements.savePrompt.style.display !== "none") {
+    elements.saveYesButton.onclick();
+  } else {
+    //playing
+    stopGame();
+    showSavePrompt();
+  }
+});
+
 function start() {
-  document.getElementById("menu").style.display = "none";
+  window.history.pushState(null, "", window.location.href);
+  elements.menu.style.display = "none";
   startGame();
 }
 
 function restart() {
-  document.getElementById("lose-prompt").style.display = "none";
-  startGame();
+  elements.losePrompt.style.display = "none";
+  startGame(true);
 }
 
-const startButton = document.getElementById("start-btn");
-const restartButton = document.getElementById("restart-btn");
-const backButton = document.getElementById("back-btn");
-
-startButton.onclick = function (e) {
+elements.startButton.onclick = function (e) {
   if (stateIndex === GameStates.MENU) {
     start();
   }
 };
 
-restartButton.onclick = function () {
+elements.restartButton.onclick = function () {
   restart();
 };
 
-function updateMyBest() {
-  const myBestElement = document.getElementById("my-best");
-  const myBestScore = localStorage.getItem("suika-highscore") || "--";
-  myBestElement.textContent = `${myBestScore}`;
-}
-
-// TODO: use db
-function updateWorldRank() {
-  const worldRankElement = document.getElementById("world-rank");
-  const myBestScore = localStorage.getItem("suika-highscore");
-  if (!myBestScore) {
-    worldRankElement.textContent = "--";
-    return;
+function showMenu() {
+  if (haveSavedGame()) {
+    elements.startButton.textContent = "Continue";
+  } else {
+    elements.startButton.textContent = "Start";
   }
-  const rank = Math.max(1, (3000 - parseInt(myBestScore)) * 3);
-  worldRankElement.textContent = `${rank}`;
+  elements.menu.style.display = "flex";
+  elements.startButton.focus();
+  stateIndex = GameStates.MENU;
 }
 
-backButton.onclick = function () {
-  document.getElementById("lose-prompt").style.display = "none";
-  updateMyBest();
-  updateWorldRank();
-  document.getElementById("menu").style.display = "flex";
-  startButton.focus();
-  stateIndex = GameStates.MENU;
+elements.backButton.onclick = function () {
+  elements.losePrompt.style.display = "none";
+  updateMyBestElement();
+  updateWorldRankElement();
+  showMenu();
 };
 
-// TODO: make it faster
-updateMyBest();
-updateWorldRank();
-startButton.focus();
+elements.saveYesButton.onclick = function () {
+  saveGameState();
+  elements.savePrompt.style.display = "none";
+  showMenu();
+};
+
+elements.saveNoButton.onclick = function () {
+  //clearGameState();
+  elements.savePrompt.style.display = "none";
+  showMenu();
+};
