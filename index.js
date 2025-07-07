@@ -61,17 +61,17 @@ const GameStates = {
 };
 
 const fruitSizes = [
-  { radius: 49 * 0.5, scoreValue: 1, img: "./images/0.png" },
-  { radius: 63 * 0.5, scoreValue: 3, img: "./images/1.png" },
-  { radius: 88 * 0.5, scoreValue: 6, img: "./images/2.png" },
-  { radius: 96 * 0.5, scoreValue: 10, img: "./images/3.png" },
-  { radius: 126 * 0.5, scoreValue: 15, img: "./images/4.png" },
-  { radius: 164 * 0.5, scoreValue: 21, img: "./images/5.png" },
-  { radius: 184 * 0.5, scoreValue: 28, img: "./images/6.png" },
-  { radius: 223 * 0.5, scoreValue: 36, img: "./images/7.png" },
-  { radius: 251 * 0.5, scoreValue: 45, img: "./images/8.png" },
-  { radius: 309 * 0.5, scoreValue: 55, img: "./images/9.png" },
-  { radius: 360 * 0.5, scoreValue: 66, img: "./images/10.png" },
+  { radius: 49 * 0.5, scoreValue: 1, img: "./assets/img/circle0.png" },
+  { radius: 63 * 0.5, scoreValue: 3, img: "./assets/img/circle1.png" },
+  { radius: 88 * 0.5, scoreValue: 6, img: "./assets/img/circle2.png" },
+  { radius: 96 * 0.5, scoreValue: 10, img: "./assets/img/circle3.png" },
+  { radius: 126 * 0.5, scoreValue: 15, img: "./assets/img/circle4.png" },
+  { radius: 164 * 0.5, scoreValue: 21, img: "./assets/img/circle5.png" },
+  { radius: 184 * 0.5, scoreValue: 28, img: "./assets/img/circle6.png" },
+  { radius: 223 * 0.5, scoreValue: 36, img: "./assets/img/circle7.png" },
+  { radius: 251 * 0.5, scoreValue: 45, img: "./assets/img/circle8.png" },
+  { radius: 309 * 0.5, scoreValue: 55, img: "./assets/img/circle9.png" },
+  { radius: 360 * 0.5, scoreValue: 66, img: "./assets/img/circle10.png" },
 ];
 
 const container_height = 960;
