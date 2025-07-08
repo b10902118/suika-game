@@ -278,6 +278,7 @@ const validKeys = [
   "3",
   "4",
   "6",
+  "5",
 ];
 
 const stepSmall = 20; // pixels to move per key press
@@ -296,7 +297,7 @@ function handlePlayKeydown(e) {
     previewBall.position.x = Math.max(previewBall.position.x - stepBig, lb);
   } else if (e.key === "3") {
     previewBall.position.x = Math.min(previewBall.position.x + stepBig, rb);
-  } else if (e.key === "Enter" || e.key === "ArrowDown") {
+  } else if (e.key === "Enter" || e.key === "ArrowDown" || e.key === "5") {
     addFruit(previewBall.position.x);
   }
 }
