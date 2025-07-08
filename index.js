@@ -95,7 +95,9 @@ const elements = {
   saveNoButton: document.getElementById("save-no-btn"),
   hint: document.getElementById("hint"),
   score: document.getElementById("game-score"),
-  achievement: document.getElementById("achievement-btn"),
+  achievementButton: document.getElementById("achievement-btn"),
+  achievementModal: document.getElementById("achievement-modal"),
+  closeAchievementButton: document.getElementById("close-achievement-btn"),
 };
 
 var previewBall = null;
@@ -583,4 +585,38 @@ elements.saveNoButton.onclick = function () {
   //clearGameState();
   elements.savePrompt.style.display = "none";
   showMenu();
+};
+
+elements.achievementButton.onclick = function () {
+  elements.achievementModal.style.display = "flex";
+  // Example: populate table with dummy data
+  const ranks = [
+    { rank: 1, score: 2048, player: "Alice" },
+    { rank: 2, score: 1800, player: "Bob" },
+    { rank: 3, score: 1500, player: "You" },
+    { rank: 4, score: 1200, player: "Carol" },
+    { rank: 5, score: 1000, player: "Dave" },
+    { rank: 1, score: 2048, player: "Alice" },
+    { rank: 2, score: 1800, player: "Bob" },
+    { rank: 3, score: 1500, player: "You" },
+    { rank: 4, score: 1200, player: "Carol" },
+    { rank: 5, score: 1000, player: "Dave" },
+  ];
+  const tbody = document.getElementById("achievement-table-body");
+  tbody.innerHTML = "";
+  ranks.forEach((r) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td style="padding:1vh 2vw;">${r.rank}</td>
+                            <td style="padding:1vh 2vw;">${r.score}</td>
+                            <td style="padding:1vh 2vw;">${r.player}</td>`;
+    tbody.appendChild(tr);
+  });
+};
+
+elements.closeAchievementButton.onclick = function () {
+  elements.achievementModal.style.display = "none";
+};
+
+elements.achievementModal.onclick = function (e) {
+  if (e.target === this) this.style.display = "none";
 };

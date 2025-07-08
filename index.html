@@ -15,16 +15,6 @@
       padding: 0;
       overflow: hidden; /* Prevent scrolling */
     }
-    /*
-    #game-score {
-      position: fixed;
-      width: 100vw;
-      font-size: 84px;
-      font-weight: 900;
-      padding-left: 16px;
-      background: transparent;
-    }
-      */
     #game-score {
       position: absolute;
       left: 0;
@@ -96,16 +86,42 @@
         </div>
       </div>
       <div style="display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 2vw; margin-top: 5px; width: 100%;">
-        <div style="flex:1; display:flex; justify-content:flex-end;">
+        <div style="flex:1; display:flex; justify-content:flex-start;">
           <!-- Empty or add a left button if needed -->
+           <button id="setting-btn" style="font-size:5vh; width:10vh; height:10vh; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; margin-left: 2vw;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+              <path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd" />
+            </svg>
+          </button>
         </div>
         <div style="flex:0; display:flex; justify-content:center;">
           <button id="start-btn" style="font-size:5vh; width: 30vh; height: 12vh; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold;">...</button>
         </div>
         <div style="flex:1; display:flex; justify-content:flex-end;">
           <button id="achievement-btn" style="font-size:5vh; width:10vh; height:10vh; border:none; border-radius:8px; background:#ff4c4c; color:#fff; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; margin-right: 2vw;">
-            🏆
+            <svg xmlns="http://www.w3.org/2000/svg" style="" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+              <path fill-rule="evenodd" d="M5.166 2.621v.858c-1.035.148-2.059.33-3.071.543a.75.75 0 0 0-.584.859 6.753 6.753 0 0 0 6.138 5.6 6.73 6.73 0 0 0 2.743 1.346A6.707 6.707 0 0 1 9.279 15H8.54c-1.036 0-1.875.84-1.875 1.875V19.5h-.75a2.25 2.25 0 0 0-2.25 2.25c0 .414.336.75.75.75h15a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-2.25-2.25h-.75v-2.625c0-1.036-.84-1.875-1.875-1.875h-.739a6.706 6.706 0 0 1-1.112-3.173 6.73 6.73 0 0 0 2.743-1.347 6.753 6.753 0 0 0 6.139-5.6.75.75 0 0 0-.585-.858 47.077 47.077 0 0 0-3.07-.543V2.62a.75.75 0 0 0-.658-.744 49.22 49.22 0 0 0-6.093-.377c-2.063 0-4.096.128-6.093.377a.75.75 0 0 0-.657.744Zm0 2.629c0 1.196.312 2.32.857 3.294A5.266 5.266 0 0 1 3.16 5.337a45.6 45.6 0 0 1 2.006-.343v.256Zm13.5 0v-.256c.674.1 1.343.214 2.006.343a5.265 5.265 0 0 1-2.863 3.207 6.72 6.72 0 0 0 .857-3.294Z" clip-rule="evenodd" />
+            </svg>
           </button>
+        </div>
+      </div>
+      <!-- Achievement Modal -->
+      <div id="achievement-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:4000; justify-content:center; align-items:center;">
+        <div style="background:#fff; width: 90%; height:90%; border-radius:12px; text-align:center;">
+          <h2 style="font-size:6vh; color:#ff4c4c; margin-bottom:2vh; font-family:'Press Start 2P','VT323','Courier New',Courier,monospace;">Hall of Fame</h2>
+          <table style="width:100%; border-collapse:collapse; font-size:3vh; margin-bottom:3vh;">
+            <thead>
+              <tr style="background:#f7ec96;">
+                <th style="padding:1vh 2vw; border-radius:6px 0 0 6px;">Rank</th>
+                <th style="padding:1vh 2vw;">Score</th>
+                <th style="padding:1vh 2vw; border-radius:0 6px 6px 0;">Player</th>
+              </tr>
+            </thead>
+            <tbody id="achievement-table-body">
+              <!-- Ranks will be populated by JS -->
+            </tbody>
+          </table>
+          <button id="close-achievement-btn" style="font-size:4vh; padding:2vh 6vw; border:none; border-radius:6px; background:#ff4c4c; color:#fff; cursor:pointer;">Close</button>
         </div>
       </div>
     </div>
