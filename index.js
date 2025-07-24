@@ -107,7 +107,7 @@ var stateIndex = GameStates.MENU;
 var score = 0;
 const fruitsMerged = [];
 function calculateScore() {
-  new_score = fruitsMerged.reduce((total, count, sizeIndex) => {
+  const new_score = fruitsMerged.reduce((total, count, sizeIndex) => {
     const value = fruitSizes[sizeIndex].scoreValue * count;
     return total + value;
   }, 0);
